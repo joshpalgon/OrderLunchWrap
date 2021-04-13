@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import MessageUI
 
 struct ContentView: View {
     @EnvironmentObject var order: Order
@@ -42,7 +41,7 @@ struct ContentView: View {
                     Section{
                         Button(action: {
                             do {
-                                try submitOrder(order: order)
+                                try order.submitOrder()
                             } catch {
                                 print(error)
                             }
@@ -63,59 +62,7 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 
-enum DeliMeat: String, CaseIterable {
-    case turkey
-    case turkeyPastrami
-    case ham
-}
-
-struct Topping: Identifiable, Hashable {
-    var name: String
-    var value: Bool
-    var id = UUID()
-    
-    mutating func toggleValue(){
-        self.value.toggle()
-    }
-}
 
 
-class Order: ObservableObject {
-    @Published var name: String = ""
-    @Published var deliMeat: DeliMeat = .turkey
-    @Published var toppings: [Topping] = [
-        Topping(name: "Spinach", value: false),
-        Topping(name: "Onion", value: false),
-        Topping(name: "Tomato", value: false),
-        Topping(name: "Provolone", value: false),
-        Topping(name: "Swiss", value: false),
-        Topping(name: "Sriracha Mayo", value: false),
-                                        ]
-    @Published var other: String = ""
-}
-
-func submitOrder(order: Order) throws {
-    var toppings: String = ""
-    print(order.name)
-    print(order.deliMeat)
-    for topping in order.toppings {
-        if topping.value == true {
-            toppings += "\(topping.name), "
-        }
-    }
-    print(order.other)
-    
-    let orderString = "\(order.name) would like to order \(order.deliMeat) with \(toppings)"
-    
-    //SEND MESSAGE
-    let sms: String = "sms:+16787879468&body=\(orderString)"
-    let strURL: String = sms.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-    UIApplication.shared.open(URL.init(string: strURL)!, options: [:], completionHandler: nil)
-    
-}
-
-enum WrapError: Error {
-    case smsNotAvailable
-}
 
 
